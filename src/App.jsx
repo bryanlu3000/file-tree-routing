@@ -11,11 +11,16 @@ function App() {
 
   const [pathArray, setPathArray] = useState(["root"]);
   const [dirContent, setDirContent] = useState({});
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    setLoaded(false);
     axios
       .get(`${SERVER_URL}/${JSON.stringify(pathArray)}`)
-      .then((res) => setDirContent(res.data))
+      .then((res) => {
+        setDirContent(res.data);
+        setLoaded(true);
+      })
       .catch((err) => console.log(err));
   }, [pathArray]);
 
@@ -26,7 +31,9 @@ function App() {
         <>
           <Outlet />
 
-          {dirContent.type === "dir" ? (
+          {!loaded ? (
+            <h1>LOADING...</h1>
+          ) : dirContent.type === "dir" ? (
             <Folder content={dirContent.children} pathArray={pathArray} />
           ) : (
             <File name={dirContent.name} />
